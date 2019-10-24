@@ -1,0 +1,29 @@
+{
+    "name": "exper/filter-builder",
+    "license": "APACHE",
+    "authors": [
+        {
+            "name": "xuqinqin",
+            "email": "xu.qinqin@danatech.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Exper\\FilterBuilder\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Exper\\FilterBuilder\\Providers\\FilterBuilderServiceProvider"
+            ],
+            "aliases": {
+                "FilterBuilder": "Exper\\FilterBuilder\\Facades\\FilterBuilder"
+            }
+        }
+    }
+}
