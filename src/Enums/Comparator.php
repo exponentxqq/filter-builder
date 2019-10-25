@@ -16,6 +16,8 @@ class Comparator
     const NOT_IN = 'not in';
     const IS_NULL = 'is null';
     const NOT_NULL = 'not null';
+    const HAS = 'has';
+    const NOT_HAS = 'not has';
 
     const ARRAY_VALUE = [
         self::BETWEEN,
