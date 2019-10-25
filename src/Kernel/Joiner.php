@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Exper\FilterBuilder\src;
-
+namespace Exper\FilterBuilder\Kernel;
 
 class Joiner
 {

@@ -1,0 +1,14 @@
+<?php
+
+namespace DummyNamespace;
+
+use Exper\FilterBuilder\Contracts\CriterionInterface;
+use Exper\FilterBuilder\FilterStore;
+
+class DummyClass extends CriterionInterface
+{
+    public function handle(): ?FilterStore
+    {
+
+    }
+}

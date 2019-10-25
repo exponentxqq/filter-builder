@@ -1,14 +1,15 @@
 <?php
 
-namespace Exper\FilterBuilder;
+namespace Exper\FilterBuilder\Kernel;
 
 use Exper\FilterBuilder\Enums\Comparator;
 use Exper\FilterBuilder\Exceptions\InvalidFiltersException;
 use Exper\FilterBuilder\Contracts\CriterionInterface;
+use Exper\FilterBuilder\FilterStore;
 use Exper\FilterBuilder\MapGetters\Transfer;
 use Exper\FilterBuilder\src\Exceptions\InvalidCriterionException;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use \Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
  * 根据传递的filters生成相应的laravel查询构造器
