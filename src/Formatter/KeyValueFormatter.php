@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Exper\FilterBuilder\src\Formatter;
-
+namespace Exper\FilterBuilder\Formatter;
 
 use Exper\FilterBuilder\Enums\Comparator;
 use Exper\FilterBuilder\Exceptions\InvalidFiltersException;
@@ -46,7 +44,11 @@ class KeyValueFormatter
                 $filters = new FilterStore($table, $field, $filters[1] ?? null, $filters[0]);
             }
         } else {
-            $filters = new FilterStore($table, $field, $filters);
+            if (in_array($filters, Comparator::values())) {
+                $filters = new FilterStore($table, $field, null, $filters);
+            } else {
+                $filters = new FilterStore($table, $field, $filters);
+            }
         }
     }
 }

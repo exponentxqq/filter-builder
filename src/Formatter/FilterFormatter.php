@@ -1,6 +1,6 @@
 <?php
 
-namespace Exper\FilterBuilder\src\Formatter;
+namespace Exper\FilterBuilder\Formatter;
 
 use Exper\FilterBuilder\Exceptions\InvalidFiltersException;
 

@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Exper\FilterBuilder\src\Formatter;
-
+namespace Exper\FilterBuilder\Formatter;
 
 class ArrayFormatter
 {
