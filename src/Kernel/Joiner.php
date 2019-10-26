@@ -15,7 +15,7 @@ class Joiner
      * @param string $table
      * @return bool
      */
-    protected static function isJoin($query, $table)
+    public static function isJoin($query, $table)
     {
         $joinQuery = $query;
         $joins = null;

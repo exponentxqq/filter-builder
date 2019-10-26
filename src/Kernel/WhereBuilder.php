@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Exper\FilterBuilder\Kernel;
-
 
 use Exper\FilterBuilder\Enums\Comparator;
 use Exper\FilterBuilder\FilterStore;

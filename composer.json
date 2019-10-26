@@ -7,14 +7,20 @@
             "email": "xu.qinqin@danatech.com"
         }
     ],
-    "require": {},
+    "require": {
+        "illuminate/support": ">5.0",
+        "illuminate/database": ">5.0",
+        "phpunit/phpunit": ">6.0"
+    },
     "autoload": {
         "psr-4": {
             "Exper\\FilterBuilder\\": "src/"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Exper\\Tests\\": "tests/"
+        }
     },
     "extra": {
         "laravel": {
