@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Exper\FilterBuilder\src\Exceptions;
+namespace Exper\FilterBuilder\Exceptions;
 
 
 class InvalidCriterionException extends \RuntimeException

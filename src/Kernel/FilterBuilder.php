@@ -2,11 +2,11 @@
 
 namespace Exper\FilterBuilder\Kernel;
 
-use Exper\FilterBuilder\Exceptions\InvalidFiltersException;
 use Exper\FilterBuilder\Contracts\CriterionInterface;
 use Exper\FilterBuilder\FilterStore;
-use Exper\FilterBuilder\Helpers;
 use Exper\FilterBuilder\src\Exceptions\InvalidCriterionException;
+use Exper\FilterBuilder\src\Exceptions\QueryNotSetException;
+use Exper\FilterBuilder\src\Formatter\FilterFormatter;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -46,7 +46,10 @@ class FilterBuilder
 
     public function setFilters(array $filters)
     {
-        $this->filters = $this->formatFilters($filters);
+        if (!$this->table) {
+            throw new QueryNotSetException();
+        }
+        $this->filters = FilterFormatter::format($this->table, $filters);
         return $this;
     }
 
@@ -72,114 +75,6 @@ class FilterBuilder
         $this->table = $from;
         $this->query = $query;
         return $this;
-    }
-
-    /**
-     * 格式化filter参数，当filter有对应的Criterion类时，将获取该类
-     *
-     * @param $filters
-     *
-     * @return mixed
-     */
-    private function formatFilters($filters)
-    {
-        if (count($filters) > 0) {
-            if (is_string(array_first(array_keys($filters))) && strlen(array_first(array_keys($filters)))) {
-                if (is_array(array_first($filters))) {
-                    foreach ($filters as $key => &$filter) {
-                        if (is_string($key) && strlen($key)) {
-                            if (is_array($filter)) {
-                                $items = [];
-                                if (is_array(array_first($filter))) {
-                                    foreach ($filter as $item) {
-                                        if (is_array($item)) {
-                                            if (is_array(array_first($item))) {
-                                                $item = $this->formatFilters([$key => $item]);
-                                            } else {
-                                                $item = new FilterStore($this->table, $key, $item[1], $item[0]);
-                                            }
-                                        } elseif ($item !== 'or' && $item !== 'and') {
-                                            $item = new FilterStore($this->table, $key, $item[1], $item[0]);
-                                        }
-                                        if (is_array($item)) {
-                                            $items = array_merge($items, $item);
-                                        } else {
-                                            $items[] = $item;
-                                        }
-                                    }
-                                    $filter = $items;
-                                } else {
-                                    $filter = new FilterStore($this->table, $key, $filter[1], $filter[0]);
-                                }
-                            } elseif ($filter !== 'or' && $filter !== 'and') {
-                                $filter = new FilterStore($this->table, $key, $filter);
-                            }
-                        } elseif (is_array($filter)) {
-                            if (is_array(array_first($filter))) {
-                                $filter = $this->formatFilters($filter);
-                            } else {
-                                if (count($filter) == 2) {
-                                    $filter = new FilterStore($this->table, $filter[0], $filter[1]);
-                                } else {
-                                    $filter = new FilterStore($this->table, $filter[0], $filter[2], $filter[1]);
-                                }
-                            }
-                        }
-                    }
-                } elseif (array_first($filters) !== 'or' && array_first($filters) !== 'and') {
-                    $filters = new FilterStore($this->table, array_first(array_keys($filters)), array_first($filters));
-                }
-            } else {
-                if (is_array(array_first($filters))) {
-                    foreach ($filters as $key => &$filter) {
-                        if (is_string($key) && strlen($key)) {
-                            if (is_array($filter)) {
-                                $items = [];
-                                if (is_array(array_first($filter))) {
-                                    foreach ($filter as $item) {
-                                        if (is_array($item)) {
-                                            if (is_array(array_first($item))) {
-                                                $item = $this->formatFilters([$key => $item]);
-                                            } else {
-                                                $item = new FilterStore($this->table, $key, $item[1], $item[0]);
-                                            }
-                                        } elseif ($item !== 'or' && $item !== 'and') {
-                                            $item = new FilterStore($this->table, $key, $item[1], $item[0]);
-                                        }
-                                        if (is_array($item)) {
-                                            $items = array_merge($items, $item);
-                                        } else {
-                                            $items[] = $item;
-                                        }
-                                    }
-                                    $filter = $items;
-                                } else {
-                                    $filter = new FilterStore($this->table, $key, $filter[1], $filter[0]);
-                                }
-                            } elseif ($filter !== 'or' && $filter !== 'and') {
-                                $filter = new FilterStore($this->table, $key, $filter);
-                            }
-                        } elseif (is_array($filter)) {
-                            if (is_array(array_first($filter))) {
-                                $filter = $this->formatFilters($filter);
-                            } else {
-                                if (count($filter) == 2) {
-                                    $filter = new FilterStore($this->table, $filter[0], $filter[1]);
-                                } else {
-                                    $filter = new FilterStore($this->table, $filter[0], $filter[2], $filter[1]);
-                                }
-                            }
-                        }
-                    }
-                } elseif (array_first($filters) !== 'or' && array_first($filters) !== 'and') {
-                    $filters = new FilterStore($this->table, array_first(array_keys($filters)), array_first($filters));
-                }
-            }
-        } else {
-            throw new InvalidFiltersException();
-        }
-
-        return $filters;
     }
 
     /**
@@ -241,7 +136,7 @@ class FilterBuilder
             $criterion->apply($filterStore, $query, $relation);
         } else {
             Joiner::checkAndJoin($filterStore, $this->query);
-            Helpers::whereCase($filterStore, $query, $relation);
+            WhereBuilder::build($filterStore, $query, $relation);
         }
     }
 
