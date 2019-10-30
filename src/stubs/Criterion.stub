@@ -7,7 +7,7 @@ use Exper\FilterBuilder\FilterStore;
 
 class DummyClass extends CriterionInterface
 {
-    public function handle(): ?FilterStore
+    public function handle(FilterStore $filterStore, $query, $relation = 'and'): ?FilterStore
     {
 
     }

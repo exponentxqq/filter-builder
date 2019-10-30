@@ -17,24 +17,10 @@ class HasBuilder extends WhereBuilderBase
     {
         switch ($this->filter->comparator) {
             case Comparator::HAS:
-                if (is_array($this->filter->value) &&
-                    in_array(array_first($this->filter->value), Comparator::values()) ||
-                    is_numeric($this->filter->value)
-                ) {
-                    $where = $this->relation == 'or' ? 'orHas' : 'has';
-                } else {
-                    $where = $this->where . 'Has';
-                }
+                $where = $this->relation == 'or' ? 'orHas' : 'has';
                 break;
             case Comparator::NOT_HAS:
-                if (is_array($this->filter->value) &&
-                    in_array(array_first($this->filter->value), Comparator::values()) ||
-                    is_numeric($this->filter->value)
-                ) {
-                    $where = $this->relation == 'or' ? 'orDoesntHave' : 'doesntHave';
-                } else {
-                    $where = $this->where . 'DoesntHave';
-                }
+                $where = $this->relation == 'or' ? 'orDoesntHave' : 'doesntHave';
                 break;
             default:
                 throw new InvalidWhereBuilder();
@@ -51,16 +37,16 @@ class HasBuilder extends WhereBuilderBase
         if (is_array($this->filter->value)) {
             $first = array_first($this->filter->value);
             if (in_array($first, Comparator::values())) {
-                $query->$where($this->field, $this->filter->comparator, $this->filter->value);
+                call_user_func_array([$query, $where], [$this->field, $this->filter->comparator, $this->filter->value]);
             } else {
-                $query->$where($this->field, function ($builder) {
+                call_user_func_array([$query, $where], [$this->field, '>=', 1, $this->relation, function ($builder) {
                     (new FilterBuilder())->build($builder, $this->filter->value);
-                });
+                }]);
             }
         } elseif (is_numeric($this->filter->value)) {
-            $query->$where($this->field, '>=', $this->filter->value);
+            call_user_func_array([$query, $where], [$this->field, '>=', $this->filter->value]);
         } else {
-            $query->$where($this->field);
+            call_user_func_array([$query, $where], [$this->field]);
         }
     }
 }

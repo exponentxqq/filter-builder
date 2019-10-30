@@ -32,7 +32,8 @@ class MakeCriterion extends GeneratorCommand
     {
         return [
             ['table', 't', InputOption::VALUE_REQUIRED, 'db table name'],
-            ['field', 'f', InputOption::VALUE_REQUIRED, 'field name']
+            ['field', 'c', InputOption::VALUE_REQUIRED, 'field name'],
+            ['force', 'f', InputOption::VALUE_OPTIONAL, 'force create']
         ];
     }
 

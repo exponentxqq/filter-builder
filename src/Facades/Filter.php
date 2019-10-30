@@ -4,7 +4,7 @@ namespace Exper\FilterBuilder\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class FilterBuilder extends Facade
+class Filter extends Facade
 {
     public static function getFacadeAccessor()
     {

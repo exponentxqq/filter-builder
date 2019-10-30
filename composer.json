@@ -28,7 +28,7 @@
                 "Exper\\FilterBuilder\\Providers\\FilterBuilderServiceProvider"
             ],
             "aliases": {
-                "FilterBuilder": "Exper\\FilterBuilder\\Facades\\FilterBuilder"
+                "Filter": "Exper\\FilterBuilder\\Facades\\Filter"
             }
         }
     }

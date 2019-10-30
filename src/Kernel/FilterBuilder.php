@@ -41,7 +41,10 @@ class FilterBuilder
      */
     public function build($query, $filters)
     {
-        return $this->setQuery($query)->setFilters($filters)->buildQuery($query, $this->filters);
+        $this->setQuery($query)->setFilters($filters);
+        return $this->query->where(function ($builder) {
+            $this->buildQuery($builder, $this->filters);
+        });
     }
 
     public function setFilters(array $filters)
@@ -59,6 +62,7 @@ class FilterBuilder
      */
     public function setQuery($query)
     {
+        $this->query = $query;
         if (!$query instanceof EloquentBuilder && !$query instanceof QueryBuilder) {
             throw new \InvalidArgumentException(
                 "query must instanceof " . EloquentBuilder::class . ' or ' . QueryBuilder::class
@@ -73,7 +77,6 @@ class FilterBuilder
             $query = $query->getQuery();
         }
         $this->table = $from;
-        $this->query = $query;
         return $this;
     }
 
