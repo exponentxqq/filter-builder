@@ -32,7 +32,7 @@ class FilterBuilder
     private $table;
 
     /** @var CriterionInterface[] $criteria */
-    private $criteria;
+    private static $criteria;
 
     /**
      * @param EloquentBuilder|QueryBuilder $query
@@ -117,11 +117,11 @@ class FilterBuilder
 
     private function makeCriterion(FilterStore $filterStore): ?CriterionInterface
     {
-        if (isset($this->criteria[$filterStore->field])) {
-            if (is_string($this->criteria[$filterStore->field])) {
-                return new $this->criteria[$filterStore->field]();
+        if (isset(static::$criteria[$filterStore->field])) {
+            if (is_string(static::$criteria[$filterStore->field])) {
+                return new static::$criteria[$filterStore->field]();
             } else {
-                return $this->criteria[$filterStore->field];
+                return static::$criteria[$filterStore->field];
             }
         }
         return null;
@@ -155,7 +155,7 @@ class FilterBuilder
         } elseif (!$criterion instanceof CriterionInterface && !class_exists($criterion)) {
             throw new InvalidCriterionException("Criterion [{$criterion}] not exists");
         } else {
-            $this->criteria[$field] = $criterion;
+            static::$criteria[$field] = $criterion;
         }
         return $this;
     }
