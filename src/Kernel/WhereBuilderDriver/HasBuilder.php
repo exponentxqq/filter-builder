@@ -6,6 +6,7 @@ namespace Exper\FilterBuilder\Kernel\WhereBuilderDriver;
 
 use Exper\FilterBuilder\Enums\Comparator;
 use Exper\FilterBuilder\Exceptions\InvalidWhereBuilder;
+use Exper\FilterBuilder\Helpers;
 use Exper\FilterBuilder\Kernel\FilterBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
@@ -29,7 +30,7 @@ class HasBuilder extends WhereBuilderBase
     }
 
     /**
-     * @param EloquentBuilder|QueryBuilder $query
+     * @param  EloquentBuilder|QueryBuilder  $query
      * @param $where
      */
     private function handle($query, $where)
@@ -37,16 +38,31 @@ class HasBuilder extends WhereBuilderBase
         if (is_array($this->filter->value)) {
             $first = array_first($this->filter->value);
             if (in_array($first, Comparator::values())) {
-                call_user_func_array([$query, $where], [$this->field, $this->filter->comparator, $this->filter->value]);
+                call_user_func_array(
+                    [$query, $where],
+                    [Helpers::formatField($this->field, null), $this->filter->comparator, $this->filter->value]
+                );
             } else {
-                call_user_func_array([$query, $where], [$this->field, '>=', 1, $this->relation, function ($builder) {
-                    (new FilterBuilder())->build($builder, $this->filter->value);
-                }]);
+                call_user_func_array(
+                    [$query, $where],
+                    [
+                        Helpers::formatField($this->field, null),
+                        '>=',
+                        1,
+                        $this->relation,
+                        function ($builder) {
+                            (new FilterBuilder())->build($builder, $this->filter->value);
+                        }
+                    ]
+                );
             }
         } elseif (is_numeric($this->filter->value)) {
-            call_user_func_array([$query, $where], [$this->field, '>=', $this->filter->value]);
+            call_user_func_array(
+                [$query, $where],
+                [Helpers::formatField($this->field, null), '>=', $this->filter->value]
+            );
         } else {
-            call_user_func_array([$query, $where], [$this->field]);
+            call_user_func_array([$query, $where], [Helpers::formatField($this->field, null)]);
         }
     }
 }

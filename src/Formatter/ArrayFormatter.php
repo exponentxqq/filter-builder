@@ -18,6 +18,9 @@ class ArrayFormatter
                 if (is_string($key) && !is_numeric($key)) {
                     KeyValueFormatter::format($table, $key, $filter);
                 } elseif (is_array($filter)) {
+                    if (array_intersect(['field', 'comparator', 'value'], array_keys($filter))) {
+                        $filter = array_values($filter);
+                    }
                     ArrayFormatter::format($table, $filter);
                 } else {
                     NormalFormatter::format($table, $filters);
