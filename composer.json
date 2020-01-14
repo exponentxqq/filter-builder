@@ -4,7 +4,7 @@
     "authors": [
         {
             "name": "xuqinqin",
-            "email": "xu.qinqin@danatech.com"
+            "email": "wz.xu.qinqin@gmail.com"
         }
     ],
     "require": {
@@ -26,10 +26,7 @@
         "laravel": {
             "providers": [
                 "Exper\\FilterBuilder\\Providers\\FilterBuilderServiceProvider"
-            ],
-            "aliases": {
-                "Filter": "Exper\\FilterBuilder\\Facades\\Filter"
-            }
+            ]
         }
     }
 }
