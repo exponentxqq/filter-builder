@@ -51,6 +51,12 @@ class FilterBuilder
         });
     }
 
+    public function exclude($excludes)
+    {
+        $this->excludes = $excludes;
+        return $this;
+    }
+
     private function setFilters(array $filters)
     {
         if (!$this->table) {
