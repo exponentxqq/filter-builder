@@ -9,6 +9,7 @@ use Exper\FilterBuilder\FilterStore;
 use Exper\FilterBuilder\Formatter\FilterFormatter;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use InvalidArgumentException;
 
 /**
  * 根据传递的filters生成相应的laravel查询构造器
@@ -22,7 +23,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
  *  ['id' => [['>', 1], ['<', 3], 'or']]
  *  ['id' => 1, ['name', 'like', 'aa']]
  *  [['id' => 1], ['id' => 2], 'or'] // 以数组最后一个元素作为条件分组的类型【and，or】
-*/
+ */
 class FilterBuilder
 {
     private $query;
@@ -30,6 +31,9 @@ class FilterBuilder
     private $filters;
 
     private $table;
+
+    /**@var array|string[] $excludes */
+    private $excludes = [];
 
     /** @var CriterionInterface[] $criteria */
     private static $criteria;
@@ -47,7 +51,7 @@ class FilterBuilder
         });
     }
 
-    public function setFilters(array $filters)
+    private function setFilters(array $filters)
     {
         if (!$this->table) {
             throw new QueryNotSetException();
@@ -60,11 +64,11 @@ class FilterBuilder
      * @param EloquentBuilder|QueryBuilder $query
      * @return $this
      */
-    public function setQuery($query)
+    private function setQuery($query)
     {
         $this->query = $query;
         if (!$query instanceof EloquentBuilder && !$query instanceof QueryBuilder) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "query must instanceof " . EloquentBuilder::class . ' or ' . QueryBuilder::class
             );
         }
@@ -134,12 +138,14 @@ class FilterBuilder
      */
     private function buildWhere(FilterStore $filterStore, $query, $relation = 'and')
     {
-        $criterion = $this->makeCriterion($filterStore);
-        if ($criterion) {
-            $criterion->apply($filterStore, $query, $relation);
-        } else {
-            Joiner::checkAndJoin($filterStore, $this->query);
-            WhereBuilder::build($filterStore, $query, $relation);
+        if (!in_array($filterStore->field, $this->excludes)) {
+            $criterion = $this->makeCriterion($filterStore);
+            if ($criterion) {
+                $criterion->apply($filterStore, $query, $relation);
+            } else {
+                Joiner::checkAndJoin($filterStore, $this->query);
+                WhereBuilder::build($filterStore, $query, $relation);
+            }
         }
     }
 
