@@ -35,6 +35,9 @@ class FilterBuilder
     /**@var array|string[] $excludes */
     private $excludes = [];
 
+    /**@var array|string[] $includes */
+    private $includes = [];
+
     /** @var CriterionInterface[] $criteria */
     private static $criteria;
 
@@ -54,6 +57,12 @@ class FilterBuilder
     public function exclude($excludes)
     {
         $this->excludes = $excludes;
+        return $this;
+    }
+
+    public function include($includes)
+    {
+        $this->includes = $includes;
         return $this;
     }
 
@@ -144,14 +153,25 @@ class FilterBuilder
      */
     private function buildWhere(FilterStore $filterStore, $query, $relation = 'and')
     {
-        if (!in_array($filterStore->field, $this->excludes)) {
-            $criterion = $this->makeCriterion($filterStore);
-            if ($criterion) {
-                $criterion->apply($filterStore, $query, $relation);
-            } else {
-                Joiner::checkAndJoin($filterStore, $this->query);
-                WhereBuilder::build($filterStore, $query, $relation);
+        if (empty($this->includes)) {
+            if (!in_array($filterStore->field, $this->excludes)) {
+                $this->attachFilters($filterStore, $query, $relation);
             }
+        } else {
+            if (in_array($filterStore->field, $this->includes)) {
+                $this->attachFilters($filterStore, $query, $relation);
+            }
+        }
+    }
+
+    private function attachFilters(FilterStore $filterStore, $query, $relation = 'and')
+    {
+        $criterion = $this->makeCriterion($filterStore);
+        if ($criterion) {
+            $criterion->apply($filterStore, $query, $relation);
+        } else {
+            Joiner::checkAndJoin($filterStore, $this->query);
+            WhereBuilder::build($filterStore, $query, $relation);
         }
     }
 
