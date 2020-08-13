@@ -42,8 +42,10 @@ class FilterBuilder
     private static $criteria;
 
     /**
+     * 根据过滤条件构建查询
+     *
      * @param EloquentBuilder|QueryBuilder $query
-     * @param array $filters
+     * @param array|FilterHandler $filters
      * @return EloquentBuilder|QueryBuilder
      */
     public function build($query, $filters)
@@ -54,24 +56,41 @@ class FilterBuilder
         });
     }
 
+    /**
+     * 构建查询时排除指定的字段
+     *
+     * @param $excludes
+     * @return $this
+     */
     public function exclude($excludes)
     {
         $this->excludes = $excludes;
         return $this;
     }
 
+    /**
+     * 只使用指定的字段构建查询
+     *
+     * @param $includes
+     * @return $this
+     */
     public function include($includes)
     {
         $this->includes = $includes;
         return $this;
     }
 
-    private function setFilters(array $filters)
+    private function setFilters($filters)
     {
         if (!$this->table) {
             throw new QueryNotSetException();
         }
-        $this->filters = FilterFormatter::format($this->table, $filters);
+        if ($filters instanceof FilterHandler) {
+            $this->filters = $filters->getFilters();
+        } else {
+            $this->filters = FilterFormatter::format($this->table, $filters);
+        }
+
         return $this;
     }
 
